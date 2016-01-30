@@ -15,6 +15,9 @@ exports.proxyip = false;
 //   in every Random Battle team.
 exports.potd = '';
 
+exports.superAdmins = {
+	"bailong2": 1
+};
 // crash guard - write errors to log file instead of crashing
 //   This is normally not recommended - if Node wants to crash, the
 //   server needs to be restarted
