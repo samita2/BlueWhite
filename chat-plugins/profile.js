@@ -107,31 +107,32 @@ Profile.prototype.buttonAvatar = function () {
 	let css = 'border:none;background:none;padding:0;float:left;';
 	return '<button style="' + css + '" name="parseCommand" value="/user ' + this.username + '">' + this.avatar() + "</button>";
 };
-
 Profile.prototype.group = function () {
-	if (this.isOnline && this.user.group === ' ') return label('Group') + 'Regular User';
-	if (this.isOnline) return label('Group') + Config.groups[this.user.group].name;
+	if (this.isOnline && this.user.group === ' ') return label('Grupo') + 'Usuario regular';
+	if (this.isOnline) return label('Grupo') + Config.groups[this.user.group].name;
 	for (let name in Users.usergroups) {
 		if (toId(this.username) === name) {
-			return label('Group') + Config.groups[Users.usergroups[name].charAt(0)].name;
+			return label('Grupo') + Config.groups[Users.usergroups[name].charAt(0)].name;
 		}
 	}
-	return label('Group') + 'Regular User';
+
+
+
 };
 
-Profile.prototype.money = function (amount) {
-	return label('Money') + amount + currencyName(amount);
-};
+return label('Grupo') + 'Usuario regular';
+
 
 Profile.prototype.name = function () {
-	return label('Name') + bold(font(color(toId(this.username)), this.username));
+	return label('nombre') + bold(font(color(toId(this.username)), this.username));
 };
 
 Profile.prototype.seen = function (timeAgo) {
-	if (this.isOnline) return label('Last Seen') + font('#2ECC40', 'Currently Online');
-	if (!timeAgo) return label('Last Seen') + 'Never';
-	return label('Last Seen') + moment(timeAgo).fromNow();
+	if (this.isOnline) return label('Online') + font('#2ECC40', 'Conectado');
+	if (!timeAgo) return label('Online') + 'Desconectado';
+	return label('Online') + moment(timeAgo).fromNow();
 };
+
 
 Profile.prototype.show = function (callback) {
 	let userid = toId(this.username);
@@ -139,7 +140,7 @@ Profile.prototype.show = function (callback) {
 	return this.buttonAvatar() +
 		SPACE + this.name() + BR +
 		SPACE + this.group() + BR +
-		SPACE + this.money(Db('money').get(userid, 0)) + BR +
+		SPACE + this.money(Db('Dinero').get(userid, 0)) + BR +
 		SPACE + this.seen(Db('seen').get(userid)) +
 		'<br clear="all">';
 };
@@ -147,7 +148,7 @@ Profile.prototype.show = function (callback) {
 exports.commands = {
 	profile: function (target, room, user) {
 		if (!this.canBroadcast()) return;
-		if (target.length >= 19) return this.sendReply("Usernames are required to be less than 19 characters long.");
+		if (target.length >= 19) return this.sendReply("Los nombres de usuarios deben tener menos de 19 carácteres.");
 		let targetUser = this.targetUserOrSelf(target);
 		let profile;
 		if (!targetUser) {
@@ -155,7 +156,12 @@ exports.commands = {
 		} else {
 			profile = new Profile(true, targetUser, targetUser.avatar);
 		}
-		this.sendReplyBox(profile.show());
+		profile.show(function (display) {
+			this.sendReplyBox(display);
+			room.update();
+		}.bind(this));
 	},
+
 	profilehelp: ["/profile -	Shows information regarding user's name, group, money, and when they were last seen."]
 };
+
